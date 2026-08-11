@@ -1,11 +1,26 @@
 ---
 name: gitx
-description: "Turn messy AI-generated changes into clean, safe Git history with smart commits, branches, checks, safe pulls and pushes, GitHub PRs, and GitHub issue creation or fixes. Use when the user asks for gitx, a commit, a branch, checks, pull, push, a pull request or PR, a GitHub issue, to create an issue, to fix an issue, a merge conflict, Git status, or a commit plan."
+description: "Portable Git workflow skill for AI coding agents that turns messy AI-generated changes into clean Git history. Use for smart Conventional Commits, logical commit splitting, branches, checks, pull and push, GitHub PRs and issues, commit planning, Git status and history, and merge or rebase conflict resolution with Claude Code, OpenAI Codex, Cursor, and other Agent Skills-compatible tools."
 ---
 
 # GitX
 
-## Dispatch
+## Overview and when to use GitX
+
+Use GitX as one Git workflow skill for AI coding agents, from messy working-tree changes to clean commits, branches, checks, pushes, pull requests, issues, and conflict resolution. Use it to inspect changed files, group related work into logical commits, generate Conventional Commit messages, run relevant project checks, create safe branches, pull and push safely, create GitHub pull requests, create or implement GitHub issues, resolve merge or rebase conflicts, understand repository state, and preview a commit plan before changing anything.
+
+Use GitX when a user asks to:
+
+- Commit changes cleanly: “commit my changes,” “make a clean commit,” “generate a conventional commit,” “split these changes into commits,” or “plan my commits.”
+- Work with branches: “create a branch” or “create a feature branch.”
+- Inspect or validate repository state: use `gitx status` for “check my changes” or “show git status” when the user wants a read-only summary, `gitx tree` for “show git history,” and `gitx check` for “run tests before committing” or another check-and-commit request.
+- Publish work: “pull latest changes,” “push my branch,” “create a PR,” or “open a GitHub pull request.”
+- Work from GitHub tasks or integration problems: “create a GitHub issue,” “fix issue #123,” “resolve merge conflicts,” or “resolve rebase conflicts.”
+- Clean up AI-generated changes, organize unrelated file changes, prepare code for review, or improve work produced by Claude Code, OpenAI Codex, Cursor, or another coding agent.
+
+Use this portable `SKILL.md` with coding agents that support the Agent Skills format.
+
+## Commands and dispatch
 
 Treat a bare GitX invocation as Smart commit. This includes `$gitx`, `gitx`, and a skill-UI invocation that loads GitX without extra command text. Start the Smart commit workflow by inspecting the repository. Return a command list only for an explicit help or available-commands request. Smart commit requests user input only after finding two or more logical commit groups, as specified below.
 
@@ -44,11 +59,7 @@ Treat a bare GitX invocation as Smart commit. This includes `$gitx`, `gitx`, and
 6. For `gitx body`, add a useful body to each commit message.
 7. Do not push as part of a smart commit. Push only for `gitx push` or when the user explicitly asks to push.
 
-## Status and plan
-
-For `gitx status`, show the current branch, staged files, unstaged files, untracked files, and a concise changed-file summary. Do not modify the repository.
-
-For `gitx tree`, show the current branch and upstream, a working-tree summary, ahead/behind counts against the upstream or `origin`, the current PR when available, and a compact graph of the most recent 20 commits. Do not fetch, pull, push, create branches, or otherwise modify the repository.
+## Commit planning
 
 For `gitx plan`, inspect the selected changes and show the proposed commit group count, files per group, and proposed Conventional Commit messages. Do not create commits, branches, or pushes.
 
@@ -68,13 +79,6 @@ For `gitx branch check`, create a branch using the inferred prefix, then follow 
 
 For `gitx check`, detect and run relevant checks such as `npm test`, `npm run lint`, `pnpm test`, `pytest`, `cargo test`, `go test ./...`, or `make test`. If checks fail, ask whether to commit anyway.
 
-## Push
-
-For `gitx push`:
-
-1. Check that a remote named `origin` exists. If it does not, say that nothing was pushed; do not select another remote automatically.
-2. Push the current branch to `origin`. If it has no upstream, create one immediately with `git push -u origin <branch>`.
-
 ## Pull
 
 For `gitx pull`:
@@ -82,9 +86,16 @@ For `gitx pull`:
 1. Inspect the current branch, upstream, and working tree. Do not pull with uncommitted changes that could be overwritten; explain the state and ask the user how to proceed.
 2. Check that a remote named `origin` exists. If it does not, say that nothing was pulled; do not select another remote automatically.
 3. Pull the current branch from `origin`, using the repository's existing pull/rebase configuration. If `origin` has no branch with that name, explain that there is nothing to pull. Do not use `--force` or discard local work.
-4. If integration creates conflicts, stop the pull workflow and follow the Resolve behavior.
+4. If integration creates conflicts, stop the pull workflow and follow the Conflict resolution behavior.
 
-## Pull request
+## Push
+
+For `gitx push`:
+
+1. Check that a remote named `origin` exists. If it does not, say that nothing was pushed; do not select another remote automatically.
+2. Push the current branch to `origin`. If it has no upstream, create one immediately with `git push -u origin <branch>`.
+
+## Pull requests
 
 For `gitx pr [base]`:
 
@@ -107,7 +118,7 @@ For `gitx pr [base]`:
 
 7. Create the ready-for-review PR with `gh pr create --base <resolved-base> --head <current-branch> --title <generated-title> --body <generated-body>` and return its URL. Do not create a draft PR unless the user explicitly asks.
 
-## Issue
+## GitHub issues
 
 For `gitx issue <number>` where `<number>` is numeric:
 
@@ -136,7 +147,7 @@ For `gitx issue <description>`:
 
 4. Create the issue with `gh issue create --title <generated-title> --body <generated-body>` and return its URL. Do not add labels, assignees, milestones, or projects unless the user explicitly asks.
 
-## Resolve merge conflicts
+## Conflict resolution
 
 For `gitx resolve` or an in-progress merge or rebase conflict:
 
@@ -146,10 +157,16 @@ For `gitx resolve` or an in-progress merge or rebase conflict:
 4. Run the project's relevant checks—normally typecheck, tests, then formatting—and fix problems introduced by the resolution.
 5. Stage the resolved files and finish the operation: commit the merge, or run `git rebase --continue` and repeat until the rebase completes. Do not force-push.
 
+## Status and history
+
+For `gitx status`, show the current branch, staged files, unstaged files, untracked files, and a concise changed-file summary. Do not modify the repository.
+
+For `gitx tree`, show the current branch and upstream, a working-tree summary, ahead/behind counts against the upstream or `origin`, the current PR when available, and a compact graph of the most recent 20 commits. Do not fetch, pull, push, create branches, or otherwise modify the repository.
+
 ## Amend
 
 For `gitx amend`, first ask for confirmation and show the proposed amended commit message. Only after the user confirms, amend the most recent commit. Do not amend a merge commit. Do not force-push; if the amended commit was already pushed, explain that a normal push will be rejected and ask the user how they want to proceed.
 
-## Risky files
+## Safety and risky files
 
 Always warn before including likely secrets, credentials, private keys, logs, or build artifacts, including `.env`, `*.pem`, `*.key`, `credentials`, `token`, `secret`, `api_key`, `*.log`, `dist/`, `build/`, and `node_modules/`.
