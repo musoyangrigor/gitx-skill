@@ -7,7 +7,7 @@ GitX is a portable AI-agent skill that analyzes your changes, groups related fil
 ## Install
 
 ```bash
-npx skills add MusoyanGrigor/gitx-skill --skill gitx
+npx skills add musoyangrigor/gitx-skill --skill gitx
 ```
 
 The Skills CLI configures the skill for the selected supported AI agent. Start a new agent session after installation.
