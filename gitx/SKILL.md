@@ -7,7 +7,7 @@ description: "Turn messy AI-generated changes into clean, safe Git history with 
 
 ## Dispatch
 
-Treat a bare GitX invocation as Smart commit. This includes `$gitx`, `gitx`, and a skill-UI invocation that loads GitX without extra command text. Immediately inspect the repository and run the Smart commit workflow. Return a command list only for an explicit help or available-commands request. Ask only when Smart commit finds two or more logical commit groups, as specified below.
+Treat a bare GitX invocation as Smart commit. This includes `$gitx`, `gitx`, and a skill-UI invocation that loads GitX without extra command text. Start the Smart commit workflow by inspecting the repository. Return a command list only for an explicit help or available-commands request. Smart commit requests user input only after finding two or more logical commit groups, as specified below.
 
 | Command | Action |
 | --- | --- |
