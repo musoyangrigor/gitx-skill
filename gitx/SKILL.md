@@ -23,6 +23,7 @@ Treat a bare GitX invocation as Smart commit. This includes `$gitx`, `gitx`, and
 | `gitx resolve` | Resolve an in-progress merge or rebase conflict. |
 | `gitx check` | Run relevant checks, then create a smart commit. |
 | `gitx status` | Show Git status and changed-file summary; make no changes. |
+| `gitx tree` | Show a compact Git history tree and repository context; make no changes. |
 | `gitx plan` | Preview the proposed commit groups and messages; make no changes. |
 | `gitx type <type>` | Create a smart commit using the given Conventional Commit type. |
 | `gitx scope <scope>` | Create a smart commit using the given scope. |
@@ -46,6 +47,8 @@ Treat a bare GitX invocation as Smart commit. This includes `$gitx`, `gitx`, and
 ## Status and plan
 
 For `gitx status`, show the current branch, staged files, unstaged files, untracked files, and a concise changed-file summary. Do not modify the repository.
+
+For `gitx tree`, show the current branch and upstream, a working-tree summary, ahead/behind counts against the upstream or `origin`, the current PR when available, and a compact graph of the most recent 20 commits. Do not fetch, pull, push, create branches, or otherwise modify the repository.
 
 For `gitx plan`, inspect the selected changes and show the proposed commit group count, files per group, and proposed Conventional Commit messages. Do not create commits, branches, or pushes.
 

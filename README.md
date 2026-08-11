@@ -30,6 +30,7 @@ The Skills CLI configures the skill for the selected supported AI agent. Start a
 | `$gitx resolve` | Resolve an in-progress merge or rebase conflict. |
 | `$gitx check` | Run relevant checks, then create a smart commit. |
 | `$gitx status` | Show repository status without changing anything. |
+| `$gitx tree` | Show a compact Git history tree, branch, sync, PR, and working-tree information. |
 | `$gitx plan` | Preview commit groups and messages without changing anything. |
 | `$gitx type fix` | Create a smart commit with the `fix` type. |
 | `$gitx scope auth` | Create a smart commit with the `auth` scope. |
