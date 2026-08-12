@@ -1,4 +1,4 @@
 interface:
   display_name: "GitX"
-  short_description: "Smart Git commits, branches, and safe pushes"
+  short_description: "Smart Git workflows and secret scanning"
   default_prompt: "Use $gitx to commit my changes intelligently and safely."

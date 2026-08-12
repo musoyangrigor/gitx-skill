@@ -1,19 +1,19 @@
 ---
 name: gitx
-description: "Portable Git workflow skill for AI coding agents that turns messy AI-generated changes into clean Git history. Use for smart Conventional Commits, logical commit splitting, branches, checks, pull and push, GitHub PRs and issues, commit planning, Git status and history, and merge or rebase conflict resolution with Claude Code, OpenAI Codex, Cursor, and other Agent Skills-compatible tools."
+description: "Portable Git workflow skill for AI coding agents that turns messy AI-generated changes into clean Git history. Use for smart Conventional Commits, logical commit splitting, branches, checks, pull and push, GitHub PRs and issues, secret scanning, commit planning, Git status and history, and merge or rebase conflict resolution with Claude Code, OpenAI Codex, Cursor, and other Agent Skills-compatible tools."
 ---
 
 # GitX
 
 ## Overview and when to use GitX
 
-Use GitX as one Git workflow skill for AI coding agents, from messy working-tree changes to clean commits, branches, checks, pushes, pull requests, issues, and conflict resolution. Use it to inspect changed files, group related work into logical commits, generate Conventional Commit messages, run relevant project checks, create safe branches, pull and push safely, create GitHub pull requests, create or implement GitHub issues, resolve merge or rebase conflicts, understand repository state, and preview a commit plan before changing anything.
+Use GitX as one Git workflow skill for AI coding agents, from messy working-tree changes to clean commits, branches, checks, pushes, pull requests, issues, secret scanning, and conflict resolution. Use it to inspect changed files, group related work into logical commits, generate Conventional Commit messages, run relevant project checks, create safe branches, pull and push safely, create GitHub pull requests, create or implement GitHub issues, detect exposed credentials, resolve merge or rebase conflicts, understand repository state, and preview a commit plan before changing anything.
 
 Use GitX when a user asks to:
 
 - Commit changes cleanly: “commit my changes,” “make a clean commit,” “generate a conventional commit,” “split these changes into commits,” or “plan my commits.”
 - Work with branches: “create a branch” or “create a feature branch.”
-- Inspect or validate repository state: use `gitx status` for “check my changes” or “show git status” when the user wants a read-only summary, `gitx tree` for “show git history,” and `gitx check` for “run tests before committing” or another check-and-commit request.
+- Inspect or validate repository state: use `gitx status` for “check my changes” or “show git status” when the user wants a read-only summary, `gitx tree` for “show git history,” `gitx scan` for exposed secrets or sensitive files, and `gitx check` for “run tests before committing” or another check-and-commit request.
 - Publish work: “pull latest changes,” “push my branch,” “create a PR,” or “open a GitHub pull request.”
 - Work from GitHub tasks or integration problems: “create a GitHub issue,” “fix issue #123,” “resolve merge conflicts,” or “resolve rebase conflicts.”
 - Clean up AI-generated changes, organize unrelated file changes, prepare code for review, or improve work produced by Claude Code, OpenAI Codex, Cursor, or another coding agent.
@@ -39,6 +39,7 @@ Treat a bare GitX invocation as Smart commit. This includes `$gitx`, `gitx`, and
 | `gitx check` | Run relevant checks, then create a smart commit. |
 | `gitx status` | Show Git status and changed-file summary; make no changes. |
 | `gitx tree` | Show a compact Git history tree and repository context; make no changes. |
+| `gitx scan` | Scan changes and history for exposed secrets and sensitive files; make no changes. |
 | `gitx plan` | Preview the proposed commit groups and messages; make no changes. |
 | `gitx type <type>` | Create a smart commit using the given Conventional Commit type. |
 | `gitx scope <scope>` | Create a smart commit using the given scope. |
@@ -162,6 +163,17 @@ For `gitx resolve` or an in-progress merge or rebase conflict:
 For `gitx status`, show the current branch, staged files, unstaged files, untracked files, and a concise changed-file summary. Do not modify the repository.
 
 For `gitx tree`, show the current branch and upstream, a working-tree summary, ahead/behind counts against the upstream or `origin`, the current PR when available, and a compact graph of the most recent 20 commits. Do not fetch, pull, push, create branches, or otherwise modify the repository.
+
+## Secret scanning
+
+For `gitx scan`:
+
+1. Perform a read-only scan of non-ignored working-tree files, staged content, commits reachable from `HEAD`, and locally available `origin/*` history. Do not fetch automatically; state that pushed-history results reflect the locally available remote-tracking refs.
+2. Prefer an installed secret scanner such as Gitleaks or TruffleHog without installing tools or uploading repository content. When none is available, inspect filenames and content for likely API keys, access tokens, passwords, connection strings, private keys, credentials, tracked `.env` files, and other sensitive configuration. Distinguish real credentials from obvious placeholders and examples.
+3. Classify each finding as `UNCOMMITTED`, `STAGED`, `COMMITTED LOCALLY`, or `PUSHED TO ORIGIN`. Use `PUSHED TO ORIGIN` only when the containing commit is reachable from a locally available `origin/*` ref.
+4. Report the severity, exposure class, credential type, file path, line or commit when available, and a recommended action. Redact every value; never print a complete credential or secret.
+5. For a pushed credential, say to revoke or rotate it immediately and explain that deleting the file or making another commit does not invalidate the credential. Discuss history rewriting only when the user explicitly asks for remediation.
+6. Make no changes to files, the index, commits, branches, remotes, or history.
 
 ## Amend
 

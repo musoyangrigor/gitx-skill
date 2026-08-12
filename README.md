@@ -2,7 +2,7 @@
 
 Turn messy AI-generated changes into clean, safe Git history.
 
-GitX is a portable Git workflow skill for AI coding agents that turns working-tree changes into logical Conventional Commits and handles branches, project checks, safe pull and push workflows, GitHub pull requests and issues, merge and rebase conflict resolution, repository status and history, and commit planning across Agent Skills-compatible tools.
+GitX is a portable Git workflow skill for AI coding agents that turns working-tree changes into logical Conventional Commits and handles branches, project checks, safe pull and push workflows, GitHub pull requests and issues, secret scanning, merge and rebase conflict resolution, repository status and history, and commit planning across Agent Skills-compatible tools.
 
 ## Install
 
@@ -31,6 +31,7 @@ The Skills CLI configures the skill for the selected supported AI agent. Start a
 | `$gitx check` | Run relevant checks, then create a smart commit. |
 | `$gitx status` | Show repository status without changing anything. |
 | `$gitx tree` | Show a compact Git history tree, branch, sync, PR, and working-tree information. |
+| `$gitx scan` | Scan changes and Git history for exposed secrets and sensitive files without modifying anything. |
 | `$gitx plan` | Preview commit groups and messages without changing anything. |
 | `$gitx type fix` | Create a smart commit with the `fix` type. |
 | `$gitx scope auth` | Create a smart commit with the `auth` scope. |
