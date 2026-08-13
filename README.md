@@ -31,7 +31,7 @@ The Skills CLI configures the skill for the selected supported AI agent. Start a
 | `$gitx check` | Run relevant checks, then create a smart commit. |
 | `$gitx status` | Show repository status without changing anything. |
 | `$gitx tree` | Show a compact Git history tree, branch, sync, PR, and working-tree information. |
-| `$gitx scan` | Scan changes and Git history for exposed secrets and sensitive files; report clear findings, positives, recommended actions, and a secret-exposure security rating without modifying anything. |
+| `$gitx scan` | Scan changes and Git history for exposed secrets and sensitive files; summarize the project’s security state, findings, positives, recommended actions, and a secret-exposure rating without modifying anything. |
 | `$gitx plan` | Preview commit groups and messages without changing anything. |
 | `$gitx type fix` | Create a smart commit with the `fix` type. |
 | `$gitx scope auth` | Create a smart commit with the `auth` scope. |
