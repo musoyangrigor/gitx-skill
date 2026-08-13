@@ -40,6 +40,8 @@ The Skills CLI configures the skill for the selected supported AI agent. Start a
 
 If GitX finds several logical commit groups, it asks whether to create the real number of commits or one commit.
 
+For `gitx issue`, only a number such as `123` or `#123` tells GitX to implement an existing issue. Any other text creates a new GitHub issue, including descriptions that use words such as “fix” or “update.”
+
 ## Usage
 
 Invoke GitX through your AI agent's skill interface, then use the same command words. For example: `gitx plan`, `gitx check`, or `gitx branch fix/token-refresh`.
