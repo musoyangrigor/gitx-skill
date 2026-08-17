@@ -5,6 +5,12 @@ description: "Portable Git workflow skill for AI coding agents that turns messy 
 
 # GitX
 
+## Default action
+
+On a bare invocation—`$gitx`, `gitx`, or a skill-UI invocation with no extra command—immediately execute the Smart commit workflow. Make the first action a repository inspection with Git status and the relevant diff. After inspecting, create the appropriate commit or report that there is nothing to commit.
+
+Treat a bare invocation as an action, never as a help request. Do not announce that GitX was loaded, list commands or examples, ask which command to run, or wait for more instructions. Show the command list only when the user explicitly asks for help or available commands.
+
 ## Overview and when to use GitX
 
 Use GitX as one Git workflow skill for AI coding agents, from messy working-tree changes to clean commits, branches, checks, pushes, pull requests, issues, secret scanning, and conflict resolution. Use it to inspect changed files, group related work into logical commits, generate Conventional Commit messages, run relevant project checks, create safe branches, pull and push safely, create GitHub pull requests, create or implement GitHub issues, detect exposed credentials, resolve merge or rebase conflicts, understand repository state, and preview a commit plan before changing anything.
@@ -21,8 +27,6 @@ Use GitX when a user asks to:
 Use this portable `SKILL.md` with coding agents that support the Agent Skills format.
 
 ## Commands and dispatch
-
-Treat a bare GitX invocation as Smart commit. This includes `$gitx`, `gitx`, and a skill-UI invocation that loads GitX without extra command text. Start the Smart commit workflow by inspecting the repository. Return a command list only for an explicit help or available-commands request. Smart commit requests user input only after finding two or more logical commit groups, as specified below.
 
 Route `gitx issue` by argument shape, not by the intent implied by its wording. An argument containing only an issue number, such as `123` or `#123`, selects the existing-issue implementation workflow. Treat every other non-empty argument as a description for a new GitHub issue, even when it contains words such as “fix,” “update,” or “resolve.” With no argument, ask for the issue description. Never implement a problem supplied as a non-numeric `gitx issue` description.
 

@@ -12,6 +12,8 @@ npx skills add musoyangrigor/gitx-skill --skill gitx
 
 The Skills CLI configures the skill for the selected supported AI agent. Start a new agent session after installation.
 
+A bare `$gitx` invocation immediately inspects the repository and runs Smart commit. GitX shows its command list only when you ask for help.
+
 ## Commands
 
 | Command | Description |
