@@ -64,56 +64,24 @@ Example configuration:
 ```json
 {
   "prBase": "dev",
-  "branchPrefix": "feat/",
+  "branchPrefix": ["feat/", "fix/", "chore/", "docs/", "refactor/", "test/"],
   "commitScopes": ["auth", "api", "ui", "docs"],
   "checks": ["npm run lint", "npm test"],
   "draftPR": false
 }
 ```
 
-Every field is optional. With this example, `$gitx ship` and `$gitx pr` target `dev`, while `$gitx ship main` explicitly targets `main`. Generated branches use `feat/`; omit `branchPrefix` to infer prefixes such as `fix/` or `docs/` from the work. Inferred commit scopes use the listed vocabulary. Check workflows run the configured commands in order, and new PRs are ready for review unless a draft is explicitly requested.
+Every field is optional. With this example, `$gitx ship` and `$gitx pr` target `dev`, while `$gitx ship main` explicitly targets `main`. Generated branches choose a prefix from `branchPrefix` based on the work, such as `fix/` for a bug fix or `chore/` for maintenance. Use a string such as `"branchPrefix": "feat/"` to force one prefix, or omit the field for unrestricted inference. If no listed prefix fits or the choice is ambiguous, GitX asks before creating the branch. Inferred commit scopes use the listed vocabulary. Check workflows run the configured commands in order, and new PRs are ready for review unless a draft is explicitly requested.
 
 Explicit requests override saved preferences, and preferences override inferred defaults. Required repository rules still apply. Without `.gitx.json`, GitX works as before. See [project preferences](gitx/references/preferences.md) for setup behavior and validation, and the [JSON Schema](gitx/references/gitx.schema.json) for field types.
 
-## Ship work to a pull request
+## Workflow references
 
-Use `$gitx ship` for the configured `prBase` or, when omitted, the repository's default PR destination. Use `$gitx ship dev` to explicitly target `dev`. The argument names the PR's base branch, not the feature branch to create.
+Detailed behavior: [shipping](gitx/references/ship.md), [diagnosis](gitx/references/doctor.md), and [splitting edits within one file](gitx/references/same-file-splitting.md).
 
-GitX uses your current feature branch. If you are on the default branch or the requested PR base, it creates a feature branch from your current work. It runs relevant checks, commits selected changes using the smart-commit rules, pushes the source branch, and opens a PR. Already committed work skips commit creation but still runs checks. If an open PR already exists for the same source and base, GitX pushes the new commits and returns that PR.
+## Development
 
-Failed checks or a required integration stop publication. GitX does not merge the PR or force-push. See the [ship workflow](gitx/references/ship.md) for selection rules, checks, and recovery after partial completion.
-
-## Diagnose Git problems
-
-Use `$gitx doctor` when you are stuck, or add context such as `$gitx doctor push rejected`. It checks for unfinished operations, detached HEAD, missing remotes or upstreams, and branch divergence. Supplied errors can also help identify authentication or branch-protection problems.
-
-Example output:
-
-```text
-Your branch has diverged from the locally recorded origin/main.
-It has 2 local-only commits and 3 remote-only commits.
-Your working tree is clean.
-
-Next step: fetch origin to refresh the comparison before choosing
-how to integrate the remote commits.
-
-No changes made. Remote state was not refreshed.
-```
-
-Doctor explains problems and proposes next steps; it does not apply repairs. It uses local information, so it cannot confirm current remote permissions or newer remote commits. See the [diagnosis workflow](gitx/references/doctor.md) for details.
-
-## Split changes within one file
-
-GitX groups edits by purpose, even when they share a file. For example, a token-expiration fix and a login analytics event in `auth.py` can become:
-
-```text
-fix(auth): reject tokens at their expiration time
-feat(auth): record successful logins
-```
-
-Use `$gitx plan` to preview the edits assigned to each commit, then `$gitx` to create them after choosing multiple commits. GitX prefers staged edits and preserves unselected changes. Overlapping edits stay together unless a coherent intermediate version exists. `$gitx check` checks each proposed snapshot in isolation when the required environment is available; unavailable checks are reported as unverified.
-
-See the [patch-staging workflow](gitx/references/same-file-splitting.md) for staging, recovery, and validation details. Run the disposable Git examples with Python 3 and Git installed:
+Run the disposable Git examples with Python 3 and Git installed:
 
 ```bash
 python3 -m unittest discover -s tests -v

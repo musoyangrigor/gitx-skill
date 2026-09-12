@@ -90,12 +90,12 @@ For `gitx plan`, use Smart commit's selection and grouping rules and show the pr
 For `gitx branch [name]`:
 
 1. Keep existing changes; do not discard or stash them unless the user explicitly asks.
-2. Use a valid supplied branch name exactly. If no name is supplied, derive a lowercase kebab-case name and use configured `branchPrefix` when present. Otherwise infer an appropriate prefix from the intended work: `feat/` for new functionality, `fix/` for bug fixes, `hotfix/` only for urgent production fixes, `docs/` for documentation, `refactor/` for restructuring, `test/` for tests, or `chore/` for maintenance. If the prefix is unclear, ask the user; never default to `hotfix/`.
+2. Use a valid supplied branch name exactly. If no name is supplied, derive a lowercase kebab-case name and apply configured `branchPrefix` when present: use a string as the fixed prefix, or choose the best-fitting prefix from an array according to [Project preferences](references/preferences.md). Otherwise infer an appropriate prefix from the intended work: `feat/` for new functionality, `fix/` for bug fixes, `hotfix/` only for urgent production fixes, `docs/` for documentation, `refactor/` for restructuring, `test/` for tests, or `chore/` for maintenance. If the prefix is unclear, ask the user; never default to `hotfix/`.
 3. Check whether the branch exists locally or on `origin`. If it does, ask whether to switch to it or choose another name. Never overwrite it.
 4. Create and switch with `git switch -c <branch-name>`.
 5. Do not commit or push unless the command is `gitx branch check` or the user explicitly asks.
 
-For `gitx branch check`, create a branch using the inferred prefix, then follow the Checks behavior and Smart commit behavior.
+For `gitx branch check`, create a branch using the naming rules above, then follow the Checks behavior and Smart commit behavior.
 
 ## Checks
 

@@ -13,11 +13,16 @@
       "description": "Default PR destination; must be a literal valid Git branch name."
     },
     "branchPrefix": {
-      "type": "string",
-      "minLength": 2,
-      "pattern": "^[^\\s]+/$",
-      "not": { "pattern": "\\s" },
-      "description": "Prefix for inferred source branches; appending gitx-example must form a valid Git branch name."
+      "oneOf": [
+        { "$ref": "#/$defs/branchPrefix" },
+        {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/branchPrefix" }
+        }
+      ],
+      "description": "A fixed prefix or allowed prefixes chosen by the intended work for inferred source branches."
     },
     "commitScopes": {
       "type": "array",
@@ -42,6 +47,15 @@
     },
     "draftPR": {
       "type": "boolean"
+    }
+  },
+  "$defs": {
+    "branchPrefix": {
+      "type": "string",
+      "minLength": 2,
+      "pattern": "^[^\\s]+/$",
+      "not": { "pattern": "\\s" },
+      "description": "Appending gitx-example must form a valid Git branch name."
     }
   }
 }
