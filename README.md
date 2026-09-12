@@ -27,6 +27,8 @@ A bare `$gitx` invocation immediately inspects the repository and runs Smart com
 | `$gitx push` | Push the current branch to `origin`; create its upstream if needed. |
 | `$gitx pr` | Create a GitHub pull request into `origin`'s default branch with a generated title and body. |
 | `$gitx pr develop` | Create a GitHub pull request from the current branch into `develop`. |
+| `$gitx ship` | Create a feature branch if needed, run checks, commit, push, and open a PR into the default branch. |
+| `$gitx ship dev` | Run the ship workflow and open a PR targeting `dev`. |
 | `$gitx issue Login fails after token expiry` | Create a GitHub issue with a generated title and body. |
 | `$gitx issue 123` | Read GitHub issue `#123` and implement the requested fix in the current working tree. |
 | `$gitx resolve` | Resolve an in-progress merge or rebase conflict. |
@@ -51,6 +53,14 @@ For `gitx issue`, only a number such as `123` or `#123` tells GitX to implement 
 Invoke GitX through your AI agent's skill interface, then use the same command words. For example: `gitx plan`, `gitx check`, or `gitx branch fix/token-refresh`.
 
 GitX follows the portable `SKILL.md` Agent Skills format.
+
+## Ship work to a pull request
+
+Use `$gitx ship` for the repository's default PR destination, or `$gitx ship dev` to target `dev`. The argument names the PR's base branch, not the feature branch to create.
+
+GitX uses your current feature branch. If you are on the default branch or the requested PR base, it creates a feature branch from your current work. It runs relevant checks, commits selected changes using the smart-commit rules, pushes the source branch, and opens a PR. Already committed work skips commit creation but still runs checks. If an open PR already exists for the same source and base, GitX pushes the new commits and returns that PR.
+
+Failed checks or a required integration stop publication. GitX does not merge the PR or force-push. See the [ship workflow](gitx/references/ship.md) for selection rules, checks, and recovery after partial completion.
 
 ## Diagnose Git problems
 

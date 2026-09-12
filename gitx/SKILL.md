@@ -21,7 +21,7 @@ Use GitX when a user asks to:
 - Work with branches: “create a branch” or “create a feature branch.”
 - Diagnose Git problems: use `gitx doctor` for “why was my push rejected,” “why am I in detached HEAD,” or “what is blocking my Git workflow.” Explain the cause and next step without making repairs.
 - Inspect or validate repository state: use `gitx status` for “check my changes” or “show git status” when the user wants a read-only summary, `gitx tree` for “show git history,” `gitx scan` for exposed secrets or sensitive files, and `gitx check` for “run tests before committing” or another check-and-commit request.
-- Publish work: “pull latest changes,” “push my branch,” “create a PR,” or “open a GitHub pull request.”
+- Publish work: “pull latest changes,” “push my branch,” “create a PR,” or “open a GitHub pull request.” Use `gitx ship [base]` to run checks, commit, push, and open a PR in one workflow.
 - Work from GitHub tasks or integration problems: “create a GitHub issue,” “fix issue #123,” “resolve merge conflicts,” or “resolve rebase conflicts.”
 - Clean up AI-generated changes, organize unrelated file changes, prepare code for review, or improve work produced by Claude Code, OpenAI Codex, Cursor, or another coding agent.
 
@@ -30,6 +30,8 @@ Use this portable `SKILL.md` with coding agents that support the Agent Skills fo
 ## Commands and dispatch
 
 Route `gitx issue` by argument shape, not by the intent implied by its wording. An argument containing only an issue number, such as `123` or `#123`, selects the existing-issue implementation workflow. Treat every other non-empty argument as a description for a new GitHub issue, even when it contains words such as “fix,” “update,” or “resolve.” With no argument, ask for the issue description. Never implement a problem supplied as a non-numeric `gitx issue` description.
+
+For `gitx ship [base]`, the optional argument is the PR's destination branch, never the name of a new feature branch. For example, `gitx ship dev` targets `dev`. Dispatch to Ship, not directly to Branch or Pull requests.
 
 | Command | Action |
 | --- | --- |
@@ -40,6 +42,7 @@ Route `gitx issue` by argument shape, not by the intent implied by its wording. 
 | `gitx pull` | Safely pull updates for the current branch. |
 | `gitx push` | Push the current branch to `origin`. |
 | `gitx pr [base]` | Create a GitHub pull request into the default branch or the supplied base branch. |
+| `gitx ship [base]` | Create a feature branch when needed, run checks, commit, push, and open a PR into the default or supplied base branch. |
 | `gitx issue <description>` | Create a GitHub issue with a generated title and body. |
 | `gitx issue <number>` | Fix the GitHub issue with that number. |
 | `gitx resolve` | Resolve an in-progress merge or rebase conflict. |
@@ -128,6 +131,12 @@ For `gitx pr [base]`:
    ```
 
 7. Create the ready-for-review PR with `gh pr create --base <resolved-base> --head <current-branch> --title <generated-title> --body <generated-body>` and return its URL. Do not create a draft PR unless the user explicitly asks.
+
+## Ship
+
+For `gitx ship [base]`, read [Ship workflow](references/ship.md). The command authorizes creating a feature branch when needed, running checks, committing selected changes, pushing the source branch to `origin`, and creating or updating an open PR through that push. It does not authorize merging the PR, force-pushing, or automatic integration of diverged history.
+
+Reuse Branch naming, Smart commit selection and grouping, Checks detection, and Pull requests title/body conventions. Ship's reference defines the sequencing: verify the base before making changes, stop on failed or unavailable required checks, and push new commits before returning an existing PR. Without `[base]`, use the repository's detected default branch; never hardcode `main`.
 
 ## GitHub issues
 
