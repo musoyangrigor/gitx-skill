@@ -49,3 +49,20 @@ For `gitx issue`, only a number such as `123` or `#123` tells GitX to implement 
 Invoke GitX through your AI agent's skill interface, then use the same command words. For example: `gitx plan`, `gitx check`, or `gitx branch fix/token-refresh`.
 
 GitX follows the portable `SKILL.md` Agent Skills format.
+
+## Split changes within one file
+
+GitX groups edits by purpose, even when they share a file. For example, a token-expiration fix and a login analytics event in `auth.py` can become:
+
+```text
+fix(auth): reject tokens at their expiration time
+feat(auth): record successful logins
+```
+
+Use `$gitx plan` to preview the edits assigned to each commit, then `$gitx` to create them after choosing multiple commits. GitX prefers staged edits and preserves unselected changes. Overlapping edits stay together unless a coherent intermediate version exists. `$gitx check` checks each proposed snapshot in isolation when the required environment is available; unavailable checks are reported as unverified.
+
+See the [patch-staging workflow](gitx/references/same-file-splitting.md) for staging, recovery, and validation details. Run the disposable Git examples with Python 3 and Git installed:
+
+```bash
+python3 -m unittest discover -s tests -v
+```

@@ -54,21 +54,21 @@ Route `gitx issue` by argument shape, not by the intent implied by its wording. 
 
 ## Smart commit
 
-1. Inspect `git status` and the relevant diff. Prefer staged changes; otherwise use all safe changed files. For `gitx files <paths>`, select only those paths.
+1. Inspect `git status` and both staged and unstaged diffs. Prefer staged changes; otherwise use all safe changed files. For `gitx files <paths>`, apply this preference within only those paths. A partially staged file contributes only its staged edits when staged changes are selected. Preserve excluded staged changes and all unselected working-tree edits.
 2. Include modified tracked files, safe untracked files, and deletions. Exclude ignored files and warn before including risky files.
-3. Group the selected changes into logical commits.
+3. Group the selected changes by purpose, including individual edits within the same file. Read [Same-file commit splitting](references/same-file-splitting.md) when a file contributes to multiple groups or staging must be isolated from unselected edits. Keep overlapping or dependent edits together unless a coherent sequence of intermediate versions exists; order prerequisites first.
 4. If one commit is appropriate, create one clear Conventional Commit. For `gitx type <type>` or `gitx scope <scope>`, use the supplied type or scope.
 5. If two or more commits are appropriate, calculate the real number of logical groups and ask:
 
    > Do you want me to create N commits or one commit?
 
-   Replace `N` with the real number. Never show `N` or `{count}` literally. Create multiple commits only if the user chooses multiple commits; otherwise create one commit.
+   Before asking, show each proposed message and the edits belonging to it, identifying functions or hunks when a file appears in multiple groups. Replace `N` with the real number. Never show `N` or `{count}` literally. Create multiple commits only if the user chooses multiple commits; otherwise create one commit. Execute the approved groups with index-only patches as described in the reference; do not stage a whole file containing unselected or deferred edits.
 6. For `gitx body`, add a useful body to each commit message.
 7. Do not push as part of a smart commit. Push only for `gitx push` or when the user explicitly asks to push.
 
 ## Commit planning
 
-For `gitx plan`, inspect the selected changes and show the proposed commit group count, files per group, and proposed Conventional Commit messages. Do not create commits, branches, or pushes.
+For `gitx plan`, use Smart commit's selection and grouping rules and show the proposed commit group count, files and edit summaries per group, and proposed Conventional Commit messages. Identify shared files, dependencies, and edits that must stay together. Do not change files or the index, create Git objects, commits, branches, or pushes; the reference's execution steps apply only to committing.
 
 ## Branch
 
@@ -85,6 +85,8 @@ For `gitx branch check`, create a branch using the inferred prefix, then follow 
 ## Checks
 
 For `gitx check`, detect and run relevant checks such as `npm test`, `npm run lint`, `pnpm test`, `pytest`, `cargo test`, `go test ./...`, or `make test`. If checks fail, ask whether to commit anyway.
+
+When splitting commits, run requested checks against each proposed staged snapshot in isolation, following the reference. A passing check on the complete working tree does not validate intermediate commits. Ordinary smart commits require diff and dependency inspection but do not implicitly request running the test suite. Report which snapshots were tested and any checks that could not run.
 
 ## Pull
 
