@@ -19,15 +19,16 @@ A bare `$gitx` invocation immediately inspects the repository and runs Smart com
 | Command | Description |
 | --- | --- |
 | `$gitx` | Inspect changes and create a smart commit. |
+| `$gitx setup` | Preview and save project preferences in `.gitx.json`. |
 | `$gitx body` | Create a smart commit with a useful commit body. |
 | `$gitx branch` | Create and switch to a branch with an inferred prefix, such as `feat/` or `fix/`. |
 | `$gitx branch fix/token-refresh` | Create and switch to the named branch. |
 | `$gitx branch check` | Create an inferred branch, run checks, then commit. |
 | `$gitx pull` | Safely pull updates for the current branch. |
 | `$gitx push` | Push the current branch to `origin`; create its upstream if needed. |
-| `$gitx pr` | Create a GitHub pull request into `origin`'s default branch with a generated title and body. |
+| `$gitx pr` | Create a GitHub pull request into the configured base or `origin`'s default branch with a generated title and body. |
 | `$gitx pr develop` | Create a GitHub pull request from the current branch into `develop`. |
-| `$gitx ship` | Create a feature branch if needed, run checks, commit, push, and open a PR into the default branch. |
+| `$gitx ship` | Create a feature branch if needed, run checks, commit, push, and open a PR into the configured or default base branch. |
 | `$gitx ship dev` | Run the ship workflow and open a PR targeting `dev`. |
 | `$gitx issue Login fails after token expiry` | Create a GitHub issue with a generated title and body. |
 | `$gitx issue 123` | Read GitHub issue `#123` and implement the requested fix in the current working tree. |
@@ -54,9 +55,29 @@ Invoke GitX through your AI agent's skill interface, then use the same command w
 
 GitX follows the portable `SKILL.md` Agent Skills format.
 
+## Project preferences
+
+Run `$gitx setup` to inspect local conventions, preview the proposed configuration, and save `.gitx.json` at the repository root. Setup preserves existing choices, omits uncertain defaults, and does not run checks or commit the file. Commit it when you want to share the preferences with your team.
+
+Example configuration:
+
+```json
+{
+  "prBase": "dev",
+  "branchPrefix": "feat/",
+  "commitScopes": ["auth", "api", "ui", "docs"],
+  "checks": ["npm run lint", "npm test"],
+  "draftPR": false
+}
+```
+
+Every field is optional. With this example, `$gitx ship` and `$gitx pr` target `dev`, while `$gitx ship main` explicitly targets `main`. Generated branches use `feat/`; omit `branchPrefix` to infer prefixes such as `fix/` or `docs/` from the work. Inferred commit scopes use the listed vocabulary. Check workflows run the configured commands in order, and new PRs are ready for review unless a draft is explicitly requested.
+
+Explicit requests override saved preferences, and preferences override inferred defaults. Required repository rules still apply. Without `.gitx.json`, GitX works as before. See [project preferences](gitx/references/preferences.md) for setup behavior and validation, and the [JSON Schema](gitx/references/gitx.schema.json) for field types.
+
 ## Ship work to a pull request
 
-Use `$gitx ship` for the repository's default PR destination, or `$gitx ship dev` to target `dev`. The argument names the PR's base branch, not the feature branch to create.
+Use `$gitx ship` for the configured `prBase` or, when omitted, the repository's default PR destination. Use `$gitx ship dev` to explicitly target `dev`. The argument names the PR's base branch, not the feature branch to create.
 
 GitX uses your current feature branch. If you are on the default branch or the requested PR base, it creates a feature branch from your current work. It runs relevant checks, commits selected changes using the smart-commit rules, pushes the source branch, and opens a PR. Already committed work skips commit creation but still runs checks. If an open PR already exists for the same source and base, GitX pushes the new commits and returns that PR.
 

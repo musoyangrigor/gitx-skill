@@ -19,6 +19,7 @@ Use GitX when a user asks to:
 
 - Commit changes cleanly: “commit my changes,” “make a clean commit,” “generate a conventional commit,” “split these changes into commits,” or “plan my commits.”
 - Work with branches: “create a branch” or “create a feature branch.”
+- Configure GitX: use `gitx setup` to preview and save project defaults for PRs, branch names, commit scopes, and checks.
 - Diagnose Git problems: use `gitx doctor` for “why was my push rejected,” “why am I in detached HEAD,” or “what is blocking my Git workflow.” Explain the cause and next step without making repairs.
 - Inspect or validate repository state: use `gitx status` for “check my changes” or “show git status” when the user wants a read-only summary, `gitx tree` for “show git history,” `gitx scan` for exposed secrets or sensitive files, and `gitx check` for “run tests before committing” or another check-and-commit request.
 - Publish work: “pull latest changes,” “push my branch,” “create a PR,” or “open a GitHub pull request.” Use `gitx ship [base]` to run checks, commit, push, and open a PR in one workflow.
@@ -36,13 +37,14 @@ For `gitx ship [base]`, the optional argument is the PR's destination branch, ne
 | Command | Action |
 | --- | --- |
 | `gitx` | Create a smart commit. |
+| `gitx setup` | Preview and save project preferences in the repository's `.gitx.json`. |
 | `gitx body` | Create a smart commit with a useful commit body. |
 | `gitx branch [name]` | Create and switch to a branch. |
 | `gitx branch check` | Create a default branch, run checks, then create a smart commit. |
 | `gitx pull` | Safely pull updates for the current branch. |
 | `gitx push` | Push the current branch to `origin`. |
-| `gitx pr [base]` | Create a GitHub pull request into the default branch or the supplied base branch. |
-| `gitx ship [base]` | Create a feature branch when needed, run checks, commit, push, and open a PR into the default or supplied base branch. |
+| `gitx pr [base]` | Create a GitHub pull request into the supplied, configured, or default base branch. |
+| `gitx ship [base]` | Create a feature branch when needed, run checks, commit, push, and open a PR into the supplied, configured, or default base branch. |
 | `gitx issue <description>` | Create a GitHub issue with a generated title and body. |
 | `gitx issue <number>` | Fix the GitHub issue with that number. |
 | `gitx resolve` | Resolve an in-progress merge or rebase conflict. |
@@ -57,12 +59,20 @@ For `gitx ship [base]`, the optional argument is the PR's destination branch, ne
 | `gitx files <paths>` | Create a smart commit using only the given files. |
 | `gitx amend` | Ask for confirmation, then amend the most recent commit. |
 
+## Project preferences and setup
+
+Before applying defaults for commits, planning, branches, checks, PRs, or ship, look for `.gitx.json` at the current working-tree root (`git rev-parse --show-toplevel`). If present, read [Project preferences](references/preferences.md), validate it, and apply only fields relevant to the requested workflow. If absent, preserve the existing behavior. Never create configuration during an ordinary command or execute configured checks merely because the file exists.
+
+Explicit user choices override saved preferences; saved preferences override GitX's inferred defaults. Required repository instructions and execution permissions still apply. Invalid configuration must be explained before a dependent mutation; read-only commands may report it without stopping unrelated inspection.
+
+For `gitx setup`, follow the reference to inspect local conventions, preview the exact proposed JSON, and create or update only the root `.gitx.json`. Setup does not run checks, stage, commit, push, create a PR, or require GitHub authentication.
+
 ## Smart commit
 
 1. Inspect `git status` and both staged and unstaged diffs. Prefer staged changes; otherwise use all safe changed files. For `gitx files <paths>`, apply this preference within only those paths. A partially staged file contributes only its staged edits when staged changes are selected. Preserve excluded staged changes and all unselected working-tree edits.
 2. Include modified tracked files, safe untracked files, and deletions. Exclude ignored files and warn before including risky files.
 3. Group the selected changes by purpose, including individual edits within the same file. Read [Same-file commit splitting](references/same-file-splitting.md) when a file contributes to multiple groups or staging must be isolated from unselected edits. Keep overlapping or dependent edits together unless a coherent sequence of intermediate versions exists; order prerequisites first.
-4. If one commit is appropriate, create one clear Conventional Commit. For `gitx type <type>` or `gitx scope <scope>`, use the supplied type or scope.
+4. If one commit is appropriate, create one clear Conventional Commit. For `gitx type <type>` or `gitx scope <scope>`, use the supplied type or scope. When inferring a scope, use configured `commitScopes` if present; omit the scope when none fits rather than inventing one. Apply this to every proposed group, including `gitx plan`.
 5. If two or more commits are appropriate, calculate the real number of logical groups and ask:
 
    > Do you want me to create N commits or one commit?
@@ -80,7 +90,7 @@ For `gitx plan`, use Smart commit's selection and grouping rules and show the pr
 For `gitx branch [name]`:
 
 1. Keep existing changes; do not discard or stash them unless the user explicitly asks.
-2. Use a valid supplied branch name exactly. If no name is supplied, derive a lowercase kebab-case name and an appropriate prefix from the intended work: `feat/` for new functionality, `fix/` for bug fixes, `hotfix/` only for urgent production fixes, `docs/` for documentation, `refactor/` for restructuring, `test/` for tests, or `chore/` for maintenance. If the prefix is unclear, ask the user; never default to `hotfix/`.
+2. Use a valid supplied branch name exactly. If no name is supplied, derive a lowercase kebab-case name and use configured `branchPrefix` when present. Otherwise infer an appropriate prefix from the intended work: `feat/` for new functionality, `fix/` for bug fixes, `hotfix/` only for urgent production fixes, `docs/` for documentation, `refactor/` for restructuring, `test/` for tests, or `chore/` for maintenance. If the prefix is unclear, ask the user; never default to `hotfix/`.
 3. Check whether the branch exists locally or on `origin`. If it does, ask whether to switch to it or choose another name. Never overwrite it.
 4. Create and switch with `git switch -c <branch-name>`.
 5. Do not commit or push unless the command is `gitx branch check` or the user explicitly asks.
@@ -89,7 +99,7 @@ For `gitx branch check`, create a branch using the inferred prefix, then follow 
 
 ## Checks
 
-For `gitx check`, detect and run relevant checks such as `npm test`, `npm run lint`, `pnpm test`, `pytest`, `cargo test`, `go test ./...`, or `make test`. If checks fail, ask whether to commit anyway.
+For `gitx check`, use configured `checks` in order when present; otherwise detect relevant checks such as `npm test`, `npm run lint`, `pnpm test`, `pytest`, `cargo test`, `go test ./...`, or `make test`. Follow the preferences reference's command inspection and working-directory rules. Include checks required by repository instructions even if absent from the configured list. If checks fail, ask whether to commit anyway. Ship retains its stricter stop-on-failure behavior.
 
 When splitting commits, run requested checks against each proposed staged snapshot in isolation, following the reference. A passing check on the complete working tree does not validate intermediate commits. Ordinary smart commits require diff and dependency inspection but do not implicitly request running the test suite. Report which snapshots were tested and any checks that could not run.
 
@@ -114,7 +124,7 @@ For `gitx push`:
 For `gitx pr [base]`:
 
 1. Require a remote named `origin`, a named current branch, and a GitHub repository with an authenticated `gh` CLI. If any is unavailable, explain what is missing and do not create a PR.
-2. Use the supplied `[base]` branch exactly after verifying it exists on `origin`. Without `[base]`, detect the default branch from `origin/HEAD`; if it cannot be determined, ask the user which base branch to use. Never hardcode `main`.
+2. Resolve the base in this order: supplied `[base]`, configured `prBase`, then the default branch from `origin/HEAD`. Verify the resolved branch exists on `origin`; do not fall back when a supplied or configured branch is missing. If no base can be determined, ask the user which one to use. Never hardcode `main`.
 3. Inspect the working tree, commits, and diff from the resolved base branch to the current branch. Do not include uncommitted changes in the PR. If the current branch is the base branch or has no commits ahead of it, stop and explain why.
 4. Check whether a PR already exists for the current branch and resolved base branch. If it does, return its URL and do not create another one.
 5. Push the current branch to `origin` when needed. If it has no upstream, create one with `git push -u origin <branch>` because `gitx pr` explicitly requests publication. Never force-push.
@@ -130,13 +140,13 @@ For `gitx pr [base]`:
    - <checks run during this task, or "Not run (not requested)">
    ```
 
-7. Create the ready-for-review PR with `gh pr create --base <resolved-base> --head <current-branch> --title <generated-title> --body <generated-body>` and return its URL. Do not create a draft PR unless the user explicitly asks.
+7. Create the PR with `gh pr create --base <resolved-base> --head <current-branch> --title <generated-title> --body <generated-body>` and return its URL. Add `--draft` if explicitly requested or if configured `draftPR` is true without an explicit readiness override; otherwise create it ready for review. Do not change an existing PR's readiness merely to match a preference.
 
 ## Ship
 
 For `gitx ship [base]`, read [Ship workflow](references/ship.md). The command authorizes creating a feature branch when needed, running checks, committing selected changes, pushing the source branch to `origin`, and creating or updating an open PR through that push. It does not authorize merging the PR, force-pushing, or automatic integration of diverged history.
 
-Reuse Branch naming, Smart commit selection and grouping, Checks detection, and Pull requests title/body conventions. Ship's reference defines the sequencing: verify the base before making changes, stop on failed or unavailable required checks, and push new commits before returning an existing PR. Without `[base]`, use the repository's detected default branch; never hardcode `main`.
+Reuse Branch naming, Smart commit selection and grouping, Checks detection, and Pull requests title/body and draft conventions, including project preferences. Ship's reference defines the sequencing: verify the base before making changes, stop on failed or unavailable required checks, and push new commits before returning an existing PR. Without `[base]`, use configured `prBase`, then the repository's detected default branch; never hardcode `main`.
 
 ## GitHub issues
 
@@ -174,7 +184,7 @@ For `gitx resolve` or an in-progress merge or rebase conflict:
 1. Inspect the operation state, history, and every conflicting file.
 2. Trace both sides of each conflict to their source commits and understand each change's intent. Read commit messages and locally available issue or PR context when present.
 3. Resolve every hunk by preserving both intents where compatible. If they conflict, choose the behavior that best fits the integration goal and clearly note the trade-off. Do not invent unrelated behavior or abort the operation unless the user explicitly asks.
-4. Run the project's relevant checks—normally typecheck, tests, then formatting—and fix problems introduced by the resolution.
+4. Run the project's relevant checks, using configured `checks` in their listed order when present and including repository-required checks; otherwise normally run typecheck, tests, then formatting. Fix problems introduced by the resolution.
 5. Stage the resolved files and finish the operation: commit the merge, or run `git rebase --continue` and repeat until the rebase completes. Do not force-push.
 
 ## Status and history
