@@ -32,6 +32,8 @@ A bare `$gitx` invocation immediately inspects the repository and runs Smart com
 | `$gitx resolve` | Resolve an in-progress merge or rebase conflict. |
 | `$gitx check` | Run relevant checks, then create a smart commit. |
 | `$gitx status` | Show repository status without changing anything. |
+| `$gitx doctor` | Diagnose common Git problems and suggest next steps without changing anything. |
+| `$gitx doctor push rejected` | Focus diagnosis on a specific problem or supplied error. |
 | `$gitx tree` | Show a compact Git history tree, branch, sync, PR, and working-tree information. |
 | `$gitx scan` | Scan changes and Git history for exposed secrets and sensitive files; summarize the project’s security state, findings, positives, recommended actions, and a secret-exposure rating without modifying anything. |
 | `$gitx plan` | Preview commit groups and messages without changing anything. |
@@ -49,6 +51,25 @@ For `gitx issue`, only a number such as `123` or `#123` tells GitX to implement 
 Invoke GitX through your AI agent's skill interface, then use the same command words. For example: `gitx plan`, `gitx check`, or `gitx branch fix/token-refresh`.
 
 GitX follows the portable `SKILL.md` Agent Skills format.
+
+## Diagnose Git problems
+
+Use `$gitx doctor` when you are stuck, or add context such as `$gitx doctor push rejected`. It checks for unfinished operations, detached HEAD, missing remotes or upstreams, and branch divergence. Supplied errors can also help identify authentication or branch-protection problems.
+
+Example output:
+
+```text
+Your branch has diverged from the locally recorded origin/main.
+It has 2 local-only commits and 3 remote-only commits.
+Your working tree is clean.
+
+Next step: fetch origin to refresh the comparison before choosing
+how to integrate the remote commits.
+
+No changes made. Remote state was not refreshed.
+```
+
+Doctor explains problems and proposes next steps; it does not apply repairs. It uses local information, so it cannot confirm current remote permissions or newer remote commits. See the [diagnosis workflow](gitx/references/doctor.md) for details.
 
 ## Split changes within one file
 

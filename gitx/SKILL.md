@@ -1,6 +1,6 @@
 ---
 name: gitx
-description: "Portable Git workflow skill for AI coding agents that turns messy AI-generated changes into clean Git history. Use for smart Conventional Commits, logical commit splitting, branches, checks, pull and push, GitHub PRs and issues, secret scanning, commit planning, Git status and history, and merge or rebase conflict resolution with Claude Code, OpenAI Codex, Cursor, and other Agent Skills-compatible tools."
+description: "Portable Git workflow skill for AI coding agents that turns messy AI-generated changes into clean Git history. Use for smart Conventional Commits, logical commit splitting, branches, checks, pull and push, GitHub PRs and issues, secret scanning, commit planning, Git status and history, repository diagnosis, and merge or rebase conflict resolution with Claude Code, OpenAI Codex, Cursor, and other Agent Skills-compatible tools."
 ---
 
 # GitX
@@ -19,6 +19,7 @@ Use GitX when a user asks to:
 
 - Commit changes cleanly: “commit my changes,” “make a clean commit,” “generate a conventional commit,” “split these changes into commits,” or “plan my commits.”
 - Work with branches: “create a branch” or “create a feature branch.”
+- Diagnose Git problems: use `gitx doctor` for “why was my push rejected,” “why am I in detached HEAD,” or “what is blocking my Git workflow.” Explain the cause and next step without making repairs.
 - Inspect or validate repository state: use `gitx status` for “check my changes” or “show git status” when the user wants a read-only summary, `gitx tree` for “show git history,” `gitx scan` for exposed secrets or sensitive files, and `gitx check` for “run tests before committing” or another check-and-commit request.
 - Publish work: “pull latest changes,” “push my branch,” “create a PR,” or “open a GitHub pull request.”
 - Work from GitHub tasks or integration problems: “create a GitHub issue,” “fix issue #123,” “resolve merge conflicts,” or “resolve rebase conflicts.”
@@ -44,6 +45,7 @@ Route `gitx issue` by argument shape, not by the intent implied by its wording. 
 | `gitx resolve` | Resolve an in-progress merge or rebase conflict. |
 | `gitx check` | Run relevant checks, then create a smart commit. |
 | `gitx status` | Show Git status and changed-file summary; make no changes. |
+| `gitx doctor [problem]` | Diagnose repository problems and suggest next steps; make no changes. |
 | `gitx tree` | Show a compact Git history tree and repository context; make no changes. |
 | `gitx scan` | Scan changes and history for exposed secrets and sensitive files; make no changes. |
 | `gitx plan` | Preview the proposed commit groups and messages; make no changes. |
@@ -171,6 +173,12 @@ For `gitx resolve` or an in-progress merge or rebase conflict:
 For `gitx status`, show the current branch, staged files, unstaged files, untracked files, and a concise changed-file summary. Do not modify the repository.
 
 For `gitx tree`, show the current branch and upstream, a working-tree summary, ahead/behind counts against the upstream or `origin`, the current PR when available, and a compact graph of the most recent 20 commits. Do not fetch, pull, push, create branches, or otherwise modify the repository.
+
+## Repository diagnosis
+
+For `gitx doctor [problem]`, read [Repository diagnosis](references/doctor.md). Inspect local repository state and any error supplied by the user, explain observed blockers and their practical consequences, and recommend the smallest appropriate next step. An optional problem description focuses the diagnosis; it is not authorization to repair anything. Without one, inspect common workflow blockers.
+
+Keep diagnosis read-only: do not fetch, change files or Git state, run project checks or hooks, test a push, start authentication, or apply repairs. Distinguish confirmed findings from possible causes and unavailable information. Local remote-tracking refs may be stale, and a failed Git operation cannot always be explained from local state. Do not route a doctor request into Smart commit or Conflict resolution merely because changes or conflicts are present.
 
 ## Secret scanning
 
