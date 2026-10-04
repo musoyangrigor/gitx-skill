@@ -28,7 +28,7 @@
 
 - Query for an **open** PR in the `origin` repository matching both source and base. A closed/merged PR or one targeting a different base is not a match. Do not retarget or reopen it automatically.
 - Push the source branch to the same-named branch on `origin`, creating its upstream if absent. This step is required even when an open PR already exists and there are new local commits; do not take the standalone Pull requests early-return path. If already up to date, skip the redundant push. Never force-push. If publication fails, stop before creating a PR and report the error.
-- After a successful push, return the matching open PR's URL if one exists. Otherwise create a PR with the resolved base explicitly passed as `--base`, the source as `--head`, and the `origin` repository explicitly selected. Follow Pull requests title, body, and draft conventions; describe actual outgoing changes and actual checks. Use configured `draftPR` unless an explicit request overrides it. Leave existing PR readiness unchanged.
+- After a successful push, return the matching open PR's URL if one exists. Otherwise create a PR with the resolved base explicitly passed as `--base`, the source as `--head`, and the `origin` repository explicitly selected. Follow the shared [PR title, body, and readiness conventions](pull-requests.md#title-body-and-readiness); describe actual outgoing changes and actual checks.
 - If PR creation reports a duplicate or its result is uncertain, query for the same open source/base PR before retrying. Do not create duplicates, merge the PR, enable auto-merge, or delete branches.
 
 ## Completion and partial failure

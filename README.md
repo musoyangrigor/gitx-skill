@@ -77,7 +77,7 @@ Explicit requests override saved preferences, and preferences override inferred 
 
 ## Workflow references
 
-Detailed behavior: [shipping](gitx/references/ship.md), [diagnosis](gitx/references/doctor.md), and [splitting edits within one file](gitx/references/same-file-splitting.md).
+Detailed behavior: [pull requests](gitx/references/pull-requests.md), [GitHub issues](gitx/references/github-issues.md), [secret scanning](gitx/references/secret-scanning.md), [shipping](gitx/references/ship.md), [diagnosis](gitx/references/doctor.md), and [splitting edits within one file](gitx/references/same-file-splitting.md).
 
 ## Development
 
