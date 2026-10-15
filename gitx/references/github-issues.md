@@ -13,7 +13,7 @@ For `gitx issue <number>` where the argument is only a numeric reference such as
 
 For `gitx issue <description>`:
 
-1. Require a remote named `origin` and a GitHub repository with an authenticated `gh` CLI. If either is unavailable, explain what is missing and do not create an issue.
+1. Require a remote named `origin` and a GitHub repository with an authenticated `gh` CLI. If any prerequisite is unavailable, explain what is missing and stop. Never substitute a local tracker issue, including a Markdown file under `.scratch/`, even when repository documentation uses a local tracker.
 2. Require a concrete issue description. If none is supplied, ask the user what the issue is about and do not create an issue yet.
 3. Generate a concise issue title and a normal Markdown body using only facts supplied by the user or available task context:
 
@@ -31,4 +31,4 @@ For `gitx issue <description>`:
    - <relevant reproduction, context, or "No additional details provided">
    ```
 
-4. Create the issue with `gh issue create --title <generated-title> --body <generated-body>` and return its URL. Do not add labels, assignees, milestones, or projects unless the user explicitly asks.
+4. Write the generated body to a temporary file and create the issue in `origin`'s GitHub repository with `gh issue create --repo <owner/repo> --title <generated-title> --body-file <temporary-file>`. Return the confirmed GitHub issue URL. If creation fails, report the failure and stop without creating a local tracker issue or claiming success. Do not add labels, assignees, milestones, or projects unless the user explicitly asks.

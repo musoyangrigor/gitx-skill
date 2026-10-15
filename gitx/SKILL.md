@@ -17,6 +17,8 @@ Match natural-language requests to the commands below. Route “check my changes
 
 Route `gitx issue` by argument shape, not by the intent implied by its wording. An argument containing only an issue number, such as `123` or `#123`, selects the existing-issue implementation workflow. Treat every other non-empty argument as a description for a new GitHub issue, even when it contains words such as “fix,” “update,” or “resolve.” With no argument, ask for the issue description. Never implement a problem supplied as a non-numeric `gitx issue` description.
 
+`gitx issue <description>` explicitly requests publication to GitHub. Repository-local tracker conventions do not redirect this command to local files; follow the [GitHub issue creation workflow](references/github-issues.md#create-a-new-issue), including its failure handling.
+
 For `gitx ship [base]`, the optional argument is the PR's destination branch, never the name of a new feature branch. For example, `gitx ship dev` targets `dev`. Dispatch to Ship, not directly to Branch or Pull requests.
 
 | Command | Action |

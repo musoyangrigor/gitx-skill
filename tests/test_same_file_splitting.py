@@ -29,8 +29,9 @@ class SplittingExamples(unittest.TestCase):
         self.git("config", "core.hooksPath", str(self.root / "hooks"))
         self.git("config", "commit.gpgSign", "false")
         self.path = self.repo / "auth.py"
-        self.path.write_text(BASE)
-        (self.repo / "notes.txt").write_text("original\n")
+        # Match the LF bytes used by the synthetic Git blobs on every platform.
+        self.path.write_text(BASE, newline="\n")
+        (self.repo / "notes.txt").write_text("original\n", newline="\n")
         self.git("add", ".")
         self.git("commit", "-qm", "initial")
         self.serial = 0
@@ -94,7 +95,7 @@ class SplittingExamples(unittest.TestCase):
         self.assertEqual(before, {p.name: p.read_bytes() for p in self.repo.iterdir() if p.is_file()})
 
     def test_two_groups_in_one_file(self):
-        self.path.write_text(FINAL)
+        self.path.write_text(FINAL, newline="\n")
         self.git("add", "auth.py")
         self.commit_group(FIX)
         self.assertEqual(self.git("show", "HEAD:auth.py").decode(), FIX)
@@ -103,10 +104,10 @@ class SplittingExamples(unittest.TestCase):
         self.assertEqual(self.git("status", "--porcelain"), b"")
 
     def test_partially_staged_file_preserves_unstaged_edits(self):
-        self.path.write_text(FINAL)
+        self.path.write_text(FINAL, newline="\n")
         self.git("add", "auth.py")
         unstaged = FINAL + "\n# unfinished work\n"
-        self.path.write_text(unstaged)
+        self.path.write_text(unstaged, newline="\n")
         original_unstaged = self.git("diff", "--binary")
         self.commit_group(FIX)
         self.commit_group(FINAL)
@@ -115,10 +116,10 @@ class SplittingExamples(unittest.TestCase):
         self.assertEqual(self.path.read_text(), unstaged)
 
     def test_excluded_staging_survives_working_tree_selection(self):
-        (self.repo / "notes.txt").write_text("staged outside selected paths\n")
+        (self.repo / "notes.txt").write_text("staged outside selected paths\n", newline="\n")
         self.git("add", "notes.txt")
         excluded = self.git("diff", "--cached", "--", "notes.txt")
-        self.path.write_text(FINAL)
+        self.path.write_text(FINAL, newline="\n")
         self.commit_group(FIX, staged_selection=False)
         self.commit_group(FINAL, staged_selection=False)
         self.assertEqual(self.git("diff", "--cached", "--", "notes.txt"), excluded)
@@ -126,8 +127,8 @@ class SplittingExamples(unittest.TestCase):
         self.assertEqual(self.git("diff", "HEAD", "--", "auth.py"), b"")
 
     def test_excluded_staging_survives_staged_selection(self):
-        self.path.write_text(FINAL)
-        (self.repo / "notes.txt").write_text("excluded staged change\n")
+        self.path.write_text(FINAL, newline="\n")
+        (self.repo / "notes.txt").write_text("excluded staged change\n", newline="\n")
         self.git("add", ".")
         excluded = self.git("diff", "--cached", "--", "notes.txt")
         self.commit_group(FIX)
@@ -139,7 +140,7 @@ class SplittingExamples(unittest.TestCase):
         original = self.git("write-tree").strip().decode()
         candidate = self.tree("HEAD", {"auth.py": FIX})
         patch = self.patch(original, candidate)
-        self.path.write_text(BASE.replace("now > expiry", "False"))
+        self.path.write_text(BASE.replace("now > expiry", "False"), newline="\n")
         self.git("add", "auth.py")
         changed_index = self.git("write-tree")
         with self.assertRaises(subprocess.CalledProcessError):
@@ -149,21 +150,21 @@ class SplittingExamples(unittest.TestCase):
     def test_overlapping_line_has_valid_intermediate_version(self):
         # Both the comparison and its spelling change on the same source line.
         final = FIX.replace("now >= expiry", "not now < expiry")
-        self.path.write_text(final)
+        self.path.write_text(final, newline="\n")
         self.git("add", "auth.py")
         self.commit_group(FIX)
         self.commit_group(final)
         self.assertEqual(self.git("status", "--porcelain"), b"")
 
     def test_failed_hook_restores_original_staging(self):
-        self.path.write_text(FINAL)
+        self.path.write_text(FINAL, newline="\n")
         self.git("add", "auth.py")
-        (self.repo / "notes.txt").write_text("also staged\n")
+        (self.repo / "notes.txt").write_text("also staged\n", newline="\n")
         self.git("add", "notes.txt")
         hooks = self.root / "hooks"
         hooks.mkdir()
         hook = hooks / "pre-commit"
-        hook.write_text("#!/bin/sh\nexit 1\n")
+        hook.write_text("#!/bin/sh\nexit 1\n", newline="\n")
         hook.chmod(0o755)
         before = self.git("diff", "--cached", "--binary")
         self.commit_group(FIX, fail=True)
