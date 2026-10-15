@@ -49,6 +49,8 @@ If GitX finds several logical commit groups, it asks whether to create the real 
 
 For `gitx issue`, only a number such as `123` or `#123` tells GitX to implement an existing issue. Any other text creates a new GitHub issue, including descriptions that use words such as “fix” or “update.”
 
+Issue descriptions target GitHub even in repositories with a local tracker. Missing prerequisites or creation failures are reported without substituting a local issue file.
+
 ## Usage
 
 Invoke GitX through your AI agent's skill interface, then use the same command words. For example: `gitx plan`, `gitx check`, or `gitx branch fix/token-refresh`.
