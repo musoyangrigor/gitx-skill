@@ -1,5 +1,9 @@
 # GitX
 
+<!-- yarkr:badges:start -->
+[![Indexed on Yarkr](https://api.yarkr.com/functions/v1/api/api/v1/badges/repos/musoyangrigor/gitx-skill/version.svg)](https://yarkr.com/arks/musoyangrigor/gitx-skill)
+<!-- yarkr:badges:end -->
+
 Turn messy AI-generated changes into clean, safe Git history.
 
 GitX is a portable Git workflow skill for AI coding agents that turns working-tree changes into logical Conventional Commits and handles branches, project checks, safe pull and push workflows, GitHub pull requests and issues, secret scanning, merge and rebase conflict resolution, repository status and history, and commit planning across Agent Skills-compatible tools.
@@ -13,6 +17,38 @@ npx skills add musoyangrigor/gitx-skill --skill gitx
 The Skills CLI configures the skill for the selected supported AI agent. Start a new agent session after installation.
 
 A bare `$gitx` invocation immediately inspects the repository and runs Smart commit. GitX shows its command list only when you ask for help.
+
+<!-- yarkr:install:start -->
+## Install with Yarkr
+
+This repo is indexed on [Yarkr](https://yarkr.com/arks/musoyangrigor/gitx-skill) as the ark [musoyangrigor/gitx-skill](https://yarkr.com/arks/musoyangrigor/gitx-skill), so its skills install into Claude Code, Codex, Cursor and other agent harnesses with one command.
+
+### CLI
+
+Install the whole ark, which Yarkr keeps equal to this repo:
+
+```bash
+npx yarkr-cli sync musoyangrigor/gitx-skill
+```
+
+Or add individual skills:
+
+```bash
+npx yarkr-cli add skill:musoyangrigor/gitx-skill/gitx
+```
+
+No Node.js? `curl -fsSL https://yarkr.com/install.sh | sh` (macOS, Linux) or `irm https://yarkr.com/install.ps1 | iex` (Windows PowerShell) installs `yarkr` as a standalone binary; then type `yarkr` in place of `npx yarkr-cli`.
+
+### MCP
+
+Connect your agent to the ark over MCP:
+
+```bash
+npx yarkr-cli mcp add musoyangrigor/gitx-skill
+```
+
+Or point any MCP client at `https://api.yarkr.com/functions/v1/api/mcp/o/musoyangrigor/gitx-skill`.
+<!-- yarkr:install:end -->
 
 ## Commands
 
